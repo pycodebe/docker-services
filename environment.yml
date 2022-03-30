@@ -1,0 +1,8 @@
+name: text_mining
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.7.*
+  - django>=3.2.*, <4.0
+  - gunicorn
