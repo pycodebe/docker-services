@@ -11,7 +11,7 @@ The services integrated in this project:
 * Faktory workers
 
 ## Screenshots
-![Screenshot 2022-05-01 161322](https://user-images.githubusercontent.com/17100228/166156899-6da1a65e-ced0-49a0-84ce-02feb010b764.png)
+![Screenshot 2022-05-01 195032](https://user-images.githubusercontent.com/17100228/166158192-45a1c975-8e5e-4038-9ee5-0852210086eb.png)
 
 
 ## Modules
