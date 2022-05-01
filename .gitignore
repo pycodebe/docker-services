@@ -102,8 +102,9 @@ celerybeat.pid
 *.sage.py
 
 # Environments
-docker-production.env
-docker-development.env
+.env
+*.env
+.venv
 env/
 venv/
 ENV/
@@ -128,8 +129,5 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
-# Visual Studio
-.vscode
-
-# Docker
-/data
+# Django
+static

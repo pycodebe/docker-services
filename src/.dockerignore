@@ -26,3 +26,10 @@ README.md
 docker-example.env
 LICENSE
 db.sqlite3
+*.pyc
+migrations/
+__pycache__
+.idea
+*.DS_Store
+.env
+**/static  

@@ -1,25 +1,55 @@
-version: '3.4'
+version: '3.2'
 
 services:
-  app:
-    container_name: text_mining
-    build: .
-    env_file: 
-      - docker-development.env
-    ports:
-      - "8002:8002"
+  python:
+    container_name: python
+    build:
+      context: .
+      dockerfile: 
+        docker/dev/python/Dockerfile
+      args:
+        requirements: requirements/dev.txt
+    environment:
+      - DJANGO_SETTINGS_MODULE=framework.settings.development
+      - FAKTORY_URL=faktory-server:7419
     volumes:
-      - ./docker:/docker
-    
-  faktory:
-    container_name: faktory
+      - ./src:/src
+    expose:
+      - "8000"
+  
+  nginx:
+    container_name: nginx
+    build:
+      context: .
+      dockerfile:
+        docker/dev/nginx/Dockerfile
+    ports:
+      - "80:80"
+    depends_on:
+      - python
+  
+  faktory-server:
+    container_name: faktory-server
     restart: always
     image: contribsys/faktory:1.6.0
     command: ./faktory -b :7419 -w :7420 -l debug
     ports:
       - "7419:7419"
       - "7420:7420"
-      
+  
+  faktory-workers:
+    container_name: faktory-workers
+    build:
+      context: .
+      dockerfile: 
+        docker/dev/faktory_workers/Dockerfile
+    environment:
+      - FAKTORY_URL=faktory-server:7419
+    depends_on:
+      - faktory-server
+    links:
+      - faktory-server
+
   apm-server:
     container_name: apm-server
     image: docker.elastic.co/apm/apm-server:7.15.2
