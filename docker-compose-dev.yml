@@ -16,6 +16,9 @@ services:
       - ./src:/src
     expose:
       - "8000"
+    depends_on:
+      database:
+        condition: service_healthy
   
   nginx:
     container_name: nginx
@@ -119,8 +122,29 @@ services:
       retries: 20
       test: curl --write-out 'HTTP %{http_code}' --fail --silent --output /dev/null http://localhost:5601/api/status
 
+  database:
+    container_name: database
+    build:
+      context: .
+      dockerfile: 
+        docker/dev/database/Dockerfile
+    volumes:
+      - oracle_db:/var/lib/oracle_db
+      - oracle_db_data:/var/lib/oracle_db/data
+    ports:
+      - 1521:1521
+    healthcheck:
+      test: ["CMD", "bash", "-c", "echo 'select 1 from dual;' | sqlplus / as sysdba"]
+      interval: 20s
+      timeout: 20s
+      retries: 60
+
 volumes:
   esdata:
+    driver: local
+  oracle_db:
+    driver: local
+  oracle_db_data:
     driver: local
 
 networks:
