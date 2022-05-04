@@ -1,4 +1,5 @@
-FROM bolderiz/oracle-xe-21c
+FROM gvenzl/oracle-xe:21-slim
 
-COPY ./docker/dev/database/sql/create_user.sql /opt/oracle/scripts/startup/create_user.sql
-COPY ./docker/dev/database/sql/create_tablespace.sql /opt/oracle/scripts/startup/create_tablespace.sql
+
+COPY ./docker/dev/database/sql/01_create_tablespaces.sql /container-entrypoint-initdb.d/01_create_tablespaces.sql
+COPY ./docker/dev/database/sql/02_create_users.sql /container-entrypoint-initdb.d/02_create_users.sql
