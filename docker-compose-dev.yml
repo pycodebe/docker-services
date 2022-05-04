@@ -128,6 +128,8 @@ services:
       context: .
       dockerfile: 
         docker/dev/database/Dockerfile
+    environment:
+      - ORACLE_RANDOM_PASSWORD=yes
     volumes:
       - oracle_db:/var/lib/oracle_db
       - oracle_db_data:/var/lib/oracle_db/data
