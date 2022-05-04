@@ -131,3 +131,6 @@ dmypy.json
 
 # Django
 static
+
+# Portainer - docker monitoring
+portainer-data
