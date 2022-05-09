@@ -9,9 +9,13 @@ The services integrated in this project:
 * APM-Server
 * Faktory
 * Faktory workers
+* Portainer as containers monitoring
+* maildev as the SMTP and mail client for development
+* Oracle 21c XE for the database 
+* Cronicle for the crontab management
 
 ## Screenshots
-![Screenshot 2022-05-01 195032](https://user-images.githubusercontent.com/17100228/166158192-45a1c975-8e5e-4038-9ee5-0852210086eb.png)
+![Screenshot](https://user-images.githubusercontent.com/17100228/167437443-9aba3427-e87f-4e35-857d-db07f1062584.png)
 
 
 ## Modules
@@ -32,6 +36,9 @@ The services integrated in this project:
 | Kibana | http://localhost:5601
 | ElasticSearch | http://localhost:9200
 | APM | http://localhost:8200
+| Cronicle | http://localhost:3012
+| Maildev | http://localhost:1080
+| Portainer | http://localhost:9000
 
 
 ## Prerequisite
