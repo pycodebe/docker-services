@@ -33,13 +33,12 @@ services:
   
   faktory-server:
     container_name: faktory-server
-    restart: always
     image: contribsys/faktory:1.6.0
     command: ./faktory -b :7419 -w :7420 -l debug
     ports:
       - "7419:7419"
       - "7420:7420"
-  
+
   faktory-workers:
     container_name: faktory-workers
     build:
@@ -149,7 +148,7 @@ services:
 
   portainer:
     image: portainer/portainer-ce:latest
-    container_name: containers-monitoring
+    container_name: portainer
     restart: unless-stopped
     security_opt:
       - no-new-privileges:true
