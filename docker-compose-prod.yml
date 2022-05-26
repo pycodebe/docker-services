@@ -1,55 +1,14 @@
 version: '3.2'
 
 services:
-  python:
-    container_name: python
-    build:
-      context: .
-      dockerfile: 
-        docker/prod/python/Dockerfile
-      args:
-        requirements: requirements/dev.txt
-    environment:
-      - SECRET_KEY=real-key-for-prod
-      - DJANGO_SETTINGS_MODULE=framework.settings.production
-      - FAKTORY_URL=faktory-server:7419
-    volumes:
-      - ./src:/src
-    expose:
-      - "8000"
-  
-  nginx:
-    container_name: nginx
-    build:
-      context: .
-      dockerfile:
-        docker/prod/nginx/Dockerfile
-    ports:
-      - "80:80"
-    depends_on:
-      - python
   
   faktory-server:
     container_name: faktory-server
-    restart: always
     image: contribsys/faktory:1.6.0
     command: ./faktory -b :7419 -w :7420 -l debug
     ports:
       - "7419:7419"
       - "7420:7420"
-  
-  faktory-workers:
-    container_name: faktory-workers
-    build:
-      context: .
-      dockerfile: 
-        docker/prod/faktory_workers/Dockerfile
-    environment:
-      - FAKTORY_URL=faktory-server:7419
-    depends_on:
-      - faktory-server
-    links:
-      - faktory-server
 
   apm-server:
     container_name: apm-server
@@ -64,7 +23,7 @@ services:
     ports:
       - "8200:8200"
     networks:
-      - elastic
+      - elastic_net
     command: >
        apm-server -e
          -E apm-server.rum.enabled=true
@@ -82,21 +41,21 @@ services:
     container_name: elasticsearch
     image: docker.elastic.co/elasticsearch/elasticsearch:7.15.2
     environment:
-    - bootstrap.memory_lock=true
-    - cluster.name=docker-cluster
-    - cluster.routing.allocation.disk.threshold_enabled=false
-    - discovery.type=single-node
-    - ES_JAVA_OPTS=-XX:UseAVX=2 -Xms1g -Xmx1g
+      - bootstrap.memory_lock=true
+      - cluster.name=docker-cluster
+      - cluster.routing.allocation.disk.threshold_enabled=false
+      - discovery.type=single-node
+      - ES_JAVA_OPTS=-XX:UseAVX=2 -Xms1g -Xmx1g
     ulimits:
       memlock:
         hard: -1
         soft: -1
     volumes:
-    - esdata:/usr/share/elasticsearch/data
+      - elastic_data:/usr/share/elasticsearch/data
     ports:
-    - 9200:9200
+      - 9200:9200
     networks:
-    - elastic
+      - elastic_net
     healthcheck:
       interval: 20s
       retries: 10
@@ -112,18 +71,69 @@ services:
       ELASTICSEARCH_URL: http://elasticsearch:9200
       ELASTICSEARCH_HOSTS: http://elasticsearch:9200
     ports:
-    - 5601:5601
+      - 5601:5601
     networks:
-    - elastic
+      - elastic_net
     healthcheck:
       interval: 10s
       retries: 20
       test: curl --write-out 'HTTP %{http_code}' --fail --silent --output /dev/null http://localhost:5601/api/status
 
+  database:
+    container_name: database
+    build:
+      context: .
+      dockerfile: 
+        docker/dev/database/Dockerfile
+    environment:
+      - ORACLE_RANDOM_PASSWORD=yes
+    volumes:
+      - oracle_db:/var/lib/oracle_db
+      - oracle_data:/var/lib/oracle_db/data
+    ports:
+      - 1521:1521
+    healthcheck:
+      test: ["CMD", "bash", "-c", "echo 'select 1 from dual;' | sqlplus / as sysdba"]
+      interval: 20s
+      timeout: 20s
+      retries: 60
+
+  cronicle:
+    container_name: cronicle
+    image: svendowideit/cronicle
+    ports:
+      - "3012:3012"
+    volumes:
+      - cronicle_logs:/opt/Cronicle/logs
+      - cronicle_data:/opt/Cronicle/data
+
+  portainer:
+    container_name: portainer
+    image: portainer/portainer-ce:latest
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./portainer-data:/data
+    ports:
+      - 9000:9000
+
+  maildev:
+    container_name: mail-service
+    image: maildev/maildev
+    ports:
+      - 1080:1080
+      - 1025:1025
+
 volumes:
-  esdata:
-    driver: local
+  elastic_data:
+  oracle_db:
+  oracle_data:
+  cronicle_logs:
+  cronicle_data:
 
 networks:
-  elastic:
-    driver: bridge
+  elastic_net:
+  
