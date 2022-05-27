@@ -90,6 +90,8 @@ services:
     volumes:
       - oracle_db:/var/lib/oracle_db
       - oracle_data:/var/lib/oracle_db/data
+    networks:
+      - dbnet
     ports:
       - 1521:1521
     healthcheck:
@@ -136,4 +138,6 @@ volumes:
 
 networks:
   elastic_net:
-  
+  dbnet:
+    external: true
+    name: public
